@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mariagloria.tech — Consultoria Avançada em Tecnologia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ── RESET & BASE ───────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:   #080810;
+      --deep:    #0c0c18;
+      --surface: #12121f;
+      --border:  rgba(255,255,255,0.08);
+      --white:   #f0f0f8;
+      --dim:     rgba(240,240,248,0.45);
+      --cyan:    #00e5c8;
+      --cyan2:   #00bfff;
+      --font-display: 'Cormorant Garamond', serif;
+      --font-ui:      'Syne', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: var(--font-ui);
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ── CUSTOM CURSOR ──────────────────────────────────────── */
+    .cursor {
+      position: fixed; top: 0; left: 0; z-index: 9999;
+      pointer-events: none; mix-blend-mode: difference;
+    }
+    .cursor-dot {
+      position: absolute; width: 8px; height: 8px;
+      background: var(--cyan); border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: transform .08s;
+    }
+    .cursor-ring {
+      position: absolute; width: 36px; height: 36px;
+      border: 1px solid rgba(0,229,200,0.5); border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: transform .18s ease, width .25s, height .25s, opacity .25s;
+    }
+    body:has(a:hover) .cursor-ring,
+    body:has(button:hover) .cursor-ring {
+      width: 56px; height: 56px;
+      border-color: var(--cyan);
+    }
+
+    /* ── SCROLLBAR ──────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--black); }
+    ::-webkit-scrollbar-thumb { background: var(--cyan); border-radius: 2px; }
+
+    /* ── NAV ────────────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 60px; height: 68px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(8,8,16,0.85);
+      backdrop-filter: blur(20px);
+      animation: slideDown .6s ease forwards;
+    }
+    @keyframes slideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to   { transform: translateY(0);     opacity: 1; }
+    }
+    .nav-logo {
+      font-family: var(--font-display); font-size: 1.25rem; font-weight: 300;
+      letter-spacing: 0.5px; color: var(--white); text-decoration: none;
+    }
+    .nav-logo strong { font-weight: 600; color: var(--cyan); }
+    .nav-links { display: flex; gap: 40px; list-style: none; }
+    .nav-links a {
+      font-size: 0.78rem; font-weight: 500; letter-spacing: 1.8px;
+      text-transform: uppercase; color: var(--dim); text-decoration: none;
+      transition: color .2s; position: relative;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -4px; left: 0;
+      width: 0; height: 1px; background: var(--cyan);
+      transition: width .25s ease;
+    }
+    .nav-links a:hover { color: var(--white); }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-cta {
+      padding: 9px 22px; font-size: 0.75rem; font-weight: 600;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      background: transparent; border: 1px solid var(--cyan);
+      color: var(--cyan); text-decoration: none; border-radius: 2px;
+      transition: all .2s;
+    }
+    .nav-cta:hover { background: var(--cyan); color: var(--black); }
+
+    /* ── HERO ───────────────────────────────────────────────── */
+    #hero {
+      min-height: 100vh; display: flex; flex-direction: column;
+      justify-content: center; padding: 120px 60px 80px;
+      position: relative; overflow: hidden;
+    }
+    .hero-grid-bg {
+      position: absolute; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(rgba(0,229,200,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,200,0.04) 1px, transparent 1px);
+      background-size: 80px 80px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 80%);
+    }
+    .hero-glow {
+      position: absolute; top: 20%; right: 10%; width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(0,229,200,0.07) 0%, transparent 70%);
+      border-radius: 50%; pointer-events: none; z-index: 0;
+      animation: pulse 6s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50%       { transform: scale(1.15); opacity: 0.6; }
+    }
+    .hero-content { position: relative; z-index: 1; max-width: 900px; }
+    .hero-eyebrow {
+      display: flex; align-items: center; gap: 14px;
+      font-size: 0.72rem; letter-spacing: 2.5px; text-transform: uppercase;
+      color: var(--cyan); font-weight: 600; margin-bottom: 32px;
+      animation: fadeUp .8s ease .2s both;
+    }
+    .hero-eyebrow::before {
+      content: ''; display: block; width: 40px; height: 1px; background: var(--cyan);
+    }
+    .hero-h1 {
+      font-family: var(--font-display);
+      font-size: clamp(3.5rem, 7vw, 6.5rem);
+      font-weight: 300; line-height: 1.08;
+      margin-bottom: 36px;
+      animation: fadeUp .8s ease .35s both;
+    }
+    .hero-h1 em { font-style: italic; color: var(--cyan); }
+    .hero-h1 span { display: block; }
+    .hero-sub {
+      font-size: 1.05rem; color: var(--dim); font-weight: 400;
+      max-width: 520px; line-height: 1.8; margin-bottom: 52px;
+      animation: fadeUp .8s ease .5s both;
+    }
+    .hero-actions {
+      display: flex; align-items: center; gap: 28px;
+      animation: fadeUp .8s ease .65s both;
+    }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 12px;
+      padding: 15px 36px; background: var(--cyan); color: var(--black);
+      font-family: var(--font-ui); font-size: 0.82rem; font-weight: 700;
+      letter-spacing: 1.5px; text-transform: uppercase; text-decoration: none;
+      border: none; border-radius: 2px; cursor: none;
+      transition: all .25s; box-shadow: 0 0 0 0 rgba(0,229,200,0.4);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(0,229,200,0.3);
+    }
+    .btn-primary .arrow { transition: transform .2s; }
+    .btn-primary:hover .arrow { transform: translateX(5px); }
+    .btn-ghost {
+      font-size: 0.82rem; font-weight: 500; letter-spacing: 1px;
+      color: var(--dim); text-decoration: none;
+      transition: color .2s; display: flex; align-items: center; gap: 8px;
+    }
+    .btn-ghost:hover { color: var(--white); }
+    .hero-scroll {
+      position: absolute; bottom: 48px; left: 60px;
+      display: flex; align-items: center; gap: 12px;
+      font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--dim); z-index: 1; animation: fadeUp .8s ease .9s both;
+    }
+    .scroll-line {
+      width: 1px; height: 50px; background: linear-gradient(to bottom, var(--cyan), transparent);
+      animation: scrollAnim 2s ease-in-out infinite;
+    }
+    @keyframes scrollAnim {
+      0%, 100% { transform: scaleY(1); opacity: 1; }
+      50%       { transform: scaleY(0.5); opacity: 0.4; }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── CLIENTS BAR ────────────────────────────────────────── */
+    .clients-bar {
+      padding: 30px 60px;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 60px;
+      background: var(--deep);
+      overflow: hidden;
+    }
+    .clients-label {
+      font-size: 0.68rem; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--dim); white-space: nowrap; flex-shrink: 0;
+    }
+    .clients-scroll { display: flex; gap: 60px; animation: scrollLeft 20s linear infinite; }
+    @keyframes scrollLeft {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    .client-name {
+      font-family: var(--font-display); font-size: 1.05rem; font-weight: 300;
+      color: rgba(240,240,248,0.25); letter-spacing: 2px; white-space: nowrap;
+      transition: color .3s;
+    }
+
+    /* ── SECTION BASE ───────────────────────────────────────── */
+    section { padding: 120px 60px; }
+    .section-tag {
+      display: inline-flex; align-items: center; gap: 12px;
+      font-size: 0.7rem; letter-spacing: 2.5px; text-transform: uppercase;
+      color: var(--cyan); font-weight: 600; margin-bottom: 24px;
+    }
+    .section-tag::before {
+      content: ''; width: 30px; height: 1px; background: var(--cyan);
+    }
+    h2.section-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.4rem, 4vw, 4rem);
+      font-weight: 300; line-height: 1.15; margin-bottom: 20px;
+    }
+    h2.section-title em { font-style: italic; color: var(--cyan); }
+
+    /* ── SOBRE ──────────────────────────────────────────────── */
+    #sobre {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 100px;
+      align-items: center;
+    }
+    .sobre-left .lead {
+      font-size: 1.1rem; color: var(--dim); line-height: 1.85;
+      font-weight: 300; margin-top: 24px;
+    }
+    .sobre-numbers {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 2px;
+      margin-top: 60px;
+    }
+    .num-card {
+      padding: 30px; background: var(--surface);
+      border: 1px solid var(--border);
+    }
+    .num-card:first-child { border-radius: 8px 0 0 0; }
+    .num-card:nth-child(2) { border-radius: 0 8px 0 0; }
+    .num-card:nth-child(3) { border-radius: 0 0 0 8px; }
+    .num-card:last-child  { border-radius: 0 0 8px 0; }
+    .num-value {
+      font-family: var(--font-display); font-size: 3.2rem; font-weight: 300;
+      color: var(--cyan); line-height: 1;
+    }
+    .num-label { font-size: 0.8rem; color: var(--dim); margin-top: 8px; letter-spacing: 0.5px; }
+    .sobre-right {
+      position: relative;
+    }
+    .sobre-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 4px; padding: 48px;
+      position: relative; overflow: hidden;
+    }
+    .sobre-card::before {
+      content: ''; position: absolute; top: 0; left: 0;
+      width: 3px; height: 100%; background: linear-gradient(to bottom, var(--cyan), var(--cyan2));
+    }
+    .sobre-card blockquote {
+      font-family: var(--font-display); font-size: 1.6rem; font-weight: 300;
+      font-style: italic; line-height: 1.5; color: var(--white); margin-bottom: 28px;
+    }
+    .sobre-card cite {
+      font-size: 0.78rem; letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--cyan); font-style: normal;
+    }
+
+    /* ── SERVIÇOS ───────────────────────────────────────────── */
+    #servicos { background: var(--deep); }
+    .servicos-header {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-bottom: 64px;
+    }
+    .servicos-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+      background: var(--border); border: 1px solid var(--border);
+    }
+    .servico-card {
+      background: var(--deep); padding: 48px 40px;
+      transition: background .25s;
+      position: relative; overflow: hidden; cursor: none;
+    }
+    .servico-card::after {
+      content: ''; position: absolute; bottom: 0; left: 0;
+      height: 2px; width: 0; background: var(--cyan);
+      transition: width .35s ease;
+    }
+    .servico-card:hover { background: var(--surface); }
+    .servico-card:hover::after { width: 100%; }
+    .servico-num {
+      font-family: var(--font-display); font-size: 3.5rem; font-weight: 300;
+      color: rgba(0,229,200,0.12); line-height: 1; margin-bottom: 24px;
+      transition: color .25s;
+    }
+    .servico-card:hover .servico-num { color: rgba(0,229,200,0.25); }
+    .servico-icon {
+      font-size: 1.6rem; margin-bottom: 20px;
+      filter: grayscale(1) brightness(1.5);
+      transition: filter .25s;
+    }
+    .servico-card:hover .servico-icon { filter: none; }
+    .servico-title {
+      font-size: 1.1rem; font-weight: 600; margin-bottom: 14px;
+      letter-spacing: 0.3px;
+    }
+    .servico-desc { font-size: 0.88rem; color: var(--dim); line-height: 1.75; }
+    .servico-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+    .tag {
+      font-size: 0.65rem; letter-spacing: 1.5px; text-transform: uppercase;
+      padding: 4px 10px; border: 1px solid var(--border); color: var(--dim);
+      transition: all .2s; border-radius: 2px;
+    }
+    .servico-card:hover .tag { border-color: rgba(0,229,200,0.25); color: var(--cyan); }
+
+    /* ── METODOLOGIA ────────────────────────────────────────── */
+    #metodologia {
+      display: grid; grid-template-columns: 1fr 2fr; gap: 100px; align-items: start;
+    }
+    .metod-left { position: sticky; top: 120px; }
+    .metod-left p { font-size: 0.95rem; color: var(--dim); line-height: 1.8; margin-top: 20px; }
+    .steps { display: flex; flex-direction: column; gap: 0; }
+    .step {
+      display: grid; grid-template-columns: 80px 1fr;
+      gap: 32px; padding: 40px 0;
+      border-bottom: 1px solid var(--border);
+      align-items: start;
+    }
+    .step:first-child { border-top: 1px solid var(--border); }
+    .step-num {
+      font-family: var(--font-display); font-size: 3rem; font-weight: 300;
+      color: var(--border); line-height: 1; padding-top: 4px;
+      transition: color .3s;
+    }
+    .step:hover .step-num { color: var(--cyan); }
+    .step-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 10px; }
+    .step-desc { font-size: 0.9rem; color: var(--dim); line-height: 1.75; }
+
+    /* ── CTA ────────────────────────────────────────────────── */
+    #contato {
+      text-align: center;
+      background: var(--deep);
+      position: relative; overflow: hidden;
+    }
+    #contato::before {
+      content: ''; position: absolute; top: 50%; left: 50%;
+      width: 600px; height: 600px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,229,200,0.06), transparent 70%);
+      transform: translate(-50%, -50%); pointer-events: none;
+    }
+    .cta-wrap { position: relative; z-index: 1; max-width: 700px; margin: 0 auto; }
+    .cta-wrap .section-tag { justify-content: center; }
+    .cta-wrap .section-tag::before { display: none; }
+    .cta-h { font-family: var(--font-display); font-size: clamp(3rem, 5vw, 5rem); font-weight: 300; line-height: 1.1; margin-bottom: 24px; }
+    .cta-h em { font-style: italic; color: var(--cyan); }
+    .cta-sub { font-size: 1rem; color: var(--dim); margin-bottom: 52px; line-height: 1.75; }
+    .cta-email {
+      display: inline-block;
+      font-family: var(--font-display); font-size: 1.5rem; font-weight: 300;
+      color: var(--white); text-decoration: none; letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--cyan); padding-bottom: 4px;
+      transition: color .2s;
+    }
+    .cta-email:hover { color: var(--cyan); }
+
+    /* ── FOOTER ─────────────────────────────────────────────── */
+    footer {
+      padding: 40px 60px;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .footer-logo {
+      font-family: var(--font-display); font-size: 1.1rem; font-weight: 300;
+      color: var(--dim);
+    }
+    .footer-logo strong { color: var(--cyan); font-weight: 600; }
+    .footer-copy { font-size: 0.72rem; color: rgba(240,240,248,0.2); letter-spacing: 0.5px; }
+    .footer-links { display: flex; gap: 28px; }
+    .footer-links a {
+      font-size: 0.72rem; letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--dim); text-decoration: none; transition: color .2s;
+    }
+    .footer-links a:hover { color: var(--cyan); }
+
+    /* ── MOBILE ─────────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      nav { padding: 0 24px; }
+      .nav-links { display: none; }
+      #hero, section { padding: 100px 24px 60px; }
+      .hero-h1 { font-size: 3rem; }
+      #sobre, #metodologia { grid-template-columns: 1fr; gap: 60px; }
+      .metod-left { position: static; }
+      .servicos-grid { grid-template-columns: 1fr; }
+      .servicos-header { flex-direction: column; align-items: flex-start; gap: 20px; }
+      footer { flex-direction: column; gap: 20px; text-align: center; padding: 40px 24px; }
+      .clients-bar { padding: 20px 24px; gap: 24px; }
+      .sobre-numbers { grid-template-columns: 1fr 1fr; }
+      .hero-scroll { left: 24px; }
+      body { cursor: auto; }
+      .cursor { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CURSOR -->
+  <div class="cursor" id="cursor">
+    <div class="cursor-ring" id="cursorRing"></div>
+    <div class="cursor-dot" id="cursorDot"></div>
+  </div>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">maria<strong>gloria</strong>.tech</a>
+    <ul class="nav-links">
+      <li><a href="#sobre">Sobre</a></li>
+      <li><a href="#metodologia">Metodologia</a></li>
+      <li><a href="#contato">Contato</a></li>
+    </ul>
+    <a href="#contato" class="nav-cta">Fale conosco</a>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-grid-bg"></div>
+    <div class="hero-glow"></div>
+    <div class="hero-content">
+      <div class="hero-eyebrow">Consultoria Avançada em Tecnologia</div>
+      <h1 class="hero-h1">
+        <span>Transformamos</span>
+        <em>tecnologia</em>
+        <span>em vantagem</span>
+        <span>competitiva.</span>
+      </h1>
+      <p class="hero-sub">
+        Estratégia, arquitetura e inovação para organizações que exigem
+        o mais alto nível de excelência técnica.
+      </p>
+      <div class="hero-actions">
+        <a href="#servicos" class="btn-primary">
+          Ver serviços <span class="arrow">→</span>
+        </a>
+        <a href="#sobre" class="btn-ghost">Conheça a empresa ↓</a>
+      </div>
+    </div>
+    <div class="hero-scroll">
+      <div class="scroll-line"></div>
+      Scroll
+    </div>
+  </section>
+
+  <!-- CLIENTS BAR -->
+  <div class="clients-bar">
+    <span class="clients-label">Setores atendidos</span>
+    <div class="clients-scroll" id="clientsScroll">
+      <span class="client-name">Finanças</span>
+      <span class="client-name">Saúde</span>
+      <span class="client-name">Varejo</span>
+      <span class="client-name">Logística</span>
+      <span class="client-name">Educação</span>
+      <span class="client-name">Manufatura</span>
+      <span class="client-name">Governo</span>
+      <span class="client-name">Energia</span>
+      <!-- duplicado para loop suave -->
+      <span class="client-name">Finanças</span>
+      <span class="client-name">Saúde</span>
+      <span class="client-name">Varejo</span>
+      <span class="client-name">Logística</span>
+      <span class="client-name">Educação</span>
+      <span class="client-name">Manufatura</span>
+      <span class="client-name">Governo</span>
+      <span class="client-name">Energia</span>
+    </div>
+  </div>
+
+  <!-- SOBRE -->
+  <section id="sobre">
+    <div class="sobre-left">
+      <div class="section-tag">Sobre nós</div>
+      <h2 class="section-title">Precisão técnica.<br><em>Resultado real.</em></h2>
+      <p class="lead">
+        A mariagloria.tech nasceu da convicção de que tecnologia avançada
+        só entrega valor quando aliada a uma visão estratégica clara.
+        Somos consultores seniores com trajetória em projetos críticos
+        de alta complexidade — combinando profundidade técnica com
+        entendimento de negócio.
+      </p>
+    </div>
+    <div class="sobre-right">
+      <div class="sobre-card">
+        <blockquote>
+          "Não vendemos horas. Entregamos transformação — com responsabilidade
+          e rigor técnico em cada decisão."
+        </blockquote>
+        <cite>Time Maria Gloria Tech</cite>
+      </div>
+    </div>
+  </section>
+
+  
+
+  <!-- METODOLOGIA -->
+  <section id="metodologia">
+    <div class="metod-left">
+      <div class="section-tag">Como trabalhamos</div>
+      <h2 class="section-title">Nossa <em>metodologia.</em></h2>
+      <p>
+        Cada engajamento segue um processo estruturado que garante
+        clareza, controle e entrega de valor em cada etapa.
+      </p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div>
+          <div class="step-title">Diagnóstico</div>
+          <p class="step-desc">Imersão profunda no contexto técnico e de negócio. Mapeamos dores, gaps, ativos e oportunidades antes de qualquer recomendação.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div>
+          <div class="step-title">Estratégia</div>
+          <p class="step-desc">Desenvolvemos um plano claro, com priorização de iniciativas, estimativas de impacto e critérios de sucesso mensuráveis.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div>
+          <div class="step-title">Execução</div>
+          <p class="step-desc">Trabalhamos lado a lado com sua equipe — de forma hands-on — garantindo que a estratégia se torne realidade no ambiente produtivo.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div>
+          <div class="step-title">Validação</div>
+          <p class="step-desc">Medimos resultados continuamente, ajustamos o curso e documentamos aprendizados para que o conhecimento fique na sua organização.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA / CONTATO -->
+  <section id="contato">
+    <div class="cta-wrap">
+      <div class="section-tag">Vamos conversar</div>
+      <h2 class="cta-h">Pronto para o <em>próximo nível?</em></h2>
+      <p class="cta-sub">
+        Conte-nos sobre seu desafio. Analisamos seu contexto sem compromisso
+        e apresentamos um diagnóstico inicial gratuito.
+      </p>
+      <a class="cta-email" href="mailto:contato@mariagloria.tech">
+        contato@mariagloria.tech
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">maria<strong>gloria</strong>.tech</div>
+    <div class="footer-links">
+      <a href="#sobre">Sobre</a>
+      <a href="#servicos">Serviços</a>
+      <a href="#contato">Contato</a>
+    </div>
+    <div class="footer-copy">© 2025 mariagloria.tech — Todos os direitos reservados.</div>
+  </footer>
+
+  <script>
+    // Custom cursor
+    const dot = document.getElementById('cursorDot');
+    const ring = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    function animCursor() {
+      dot.style.left = mx + 'px'; dot.style.top = my + 'px';
+      rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+      ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+      requestAnimationFrame(animCursor);
+    }
+    animCursor();
+
+    // Scroll reveal
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.style.opacity = '1';
+          e.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.step, .servico-card, .num-card').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(20px)';
+      el.style.transition = 'opacity .6s ease, transform .6s ease';
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>
